@@ -577,9 +577,6 @@ class ServerOptimizer:
             else:
                 print("    ⚠️  dig工具也不可用，跳过详细DNS测试")
         
-        # 提供工具安装建议
-        self.suggest_tool_installation()
-        
         # 测试网站访问
         print("\n2. 测试网站访问...")
         self.run_command("curl -I --connect-timeout 10 https://github.com", "测试GitHub访问")
