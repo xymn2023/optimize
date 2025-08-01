@@ -25,6 +25,19 @@
 
 ## 🚀 快速开始
 
+## 推荐 
+
+
+一键运行
+
+
+```
+curl -sL https://raw.githubusercontent.com/xymn2023/optimize/main/run_optimizer.sh -o run_optimizer.sh && sudo chmod +x run_optimizer.sh && sudo ./run_optimizer.sh
+```
+
+## 使用说明
+
+
 1. **下载文件**
    ```bash
    # 确保所有文件在同一目录下
