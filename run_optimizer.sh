@@ -7,6 +7,9 @@ echo "           智能服务器优化工具"
 echo "========================================"
 echo
 
+# 获取脚本所在的目录
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+
 # 检测系统类型
 echo "🔍 检测系统环境..."
 if [ -f /etc/os-release ]; then
@@ -76,7 +79,7 @@ else
     echo "✅ pip3已安装: $(pip3 --version)"
 fi
 
-# 检查并安装Python依赖
+# 检查并安装requests模块
 echo "🔧 检查Python依赖..."
 if ! python3 -c "import requests" 2>/dev/null; then
     echo "📦 安装requests模块..."
@@ -104,10 +107,31 @@ else
     echo "✅ requests模块已安装"
 fi
 
+# 检查并安装dig和nslookup
+echo "🔧 检查网络工具..."
+if ! command -v dig &> /dev/null || ! command -v nslookup &> /dev/null; then
+    echo "📦 安装dig和nslookup..."
+    if command -v apt &> /dev/null; then
+        apt install -y dnsutils
+    elif command -v yum &> /dev/null || command -v dnf &> /dev/null; then
+        yum install -y bind-utils
+    else
+        echo "❌ 无法自动安装dig和nslookup，请手动安装"
+        exit 1
+    fi
+else
+    echo "✅ dig和nslookup已安装"
+fi
+
+
 # 最终验证
 echo "🔍 最终验证..."
 if ! python3 -c "import requests" 2>/dev/null; then
     echo "❌ requests模块验证失败"
+    exit 1
+fi
+if ! command -v dig &> /dev/null || ! command -v nslookup &> /dev/null; then
+    echo "❌ dig或nslookup验证失败"
     exit 1
 fi
 
@@ -116,7 +140,7 @@ echo "✅ 所有依赖检查完成"
 # 运行优化脚本
 echo
 echo "🚀 开始执行优化..."
-python3 server_optimizer.py
+python3 "$SCRIPT_DIR/server_optimizer.py"
 
 echo
-echo "优化完成！" 
+echo "优化完成！"
