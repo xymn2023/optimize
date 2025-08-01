@@ -62,7 +62,7 @@ class ServerOptimizer:
                 
                 print(f"📍 服务器位置: {data.get('country', 'Unknown')} - {data.get('regionName', '')} - {data.get('city', '')}")
                 print(f"🌐 ISP: {data.get('isp', 'Unknown')}")
-                print(f"🏳️  地区代码: {data.get('countryCode', 'Unknown')}")
+                print(f"🏳️  地区代码: {data.get('countryCode', 'Unknown')}")
                 
                 return is_china
             else:
@@ -157,7 +157,7 @@ class ServerOptimizer:
                                 
                                 # 禁用自动DNS
                                 self.run_command(f"nmcli connection modify {uuid} ipv4.ignore-auto-dns yes", 
-                                               f"禁用 {device} 的自动DNS")
+                                                 f"禁用 {device} 的自动DNS")
                                 
                                 # 重新激活连接
                                 self.run_command(f"nmcli connection up {uuid}", f"重新激活 {device} 连接")
@@ -166,7 +166,7 @@ class ServerOptimizer:
             
         except Exception as e:
             print(f"⚠️  网络管理器DNS配置失败: {e}")
-            print("   这不会影响其他优化功能")
+            print("    这不会影响其他优化功能")
     
     def optimize_github(self):
         """优化GitHub访问"""
@@ -410,22 +410,12 @@ class ServerOptimizer:
         """优化Docker镜像源"""
         print("\n🐳 优化Docker镜像源...")
         
-        if self.is_china:
-            # 国内Docker镜像源
-            docker_mirrors = [
-                "https://docker.mirrors.ustc.edu.cn",
-                "https://hub-mirror.c.163.com",
-                "https://mirror.baidubce.com",
-                "https://registry.docker-cn.com"
-            ]
-        else:
-            # 国外Docker镜像源
-            docker_mirrors = [
-                "https://registry-1.docker.io",
-                "https://docker.io"
-            ]
+        docker_mirrors = [
+            "https://docker.m.daocloud.io",
+            "https://docker.1panel.live",
+            "https://hub.rat.dev"
+        ]
         
-        # Linux Docker配置
         docker_daemon_config = {
             "registry-mirrors": docker_mirrors,
             "log-driver": "json-file",
@@ -442,11 +432,15 @@ class ServerOptimizer:
         self.run_command(f"mkdir -p {config_dir}", "创建Docker配置目录")
         
         # 写入配置文件
-        with open(config_file, 'w') as f:
-            json.dump(docker_daemon_config, f, indent=2)
-        
-        # 重启Docker服务
-        self.run_command("systemctl restart docker", "重启Docker服务")
+        try:
+            with open(config_file, 'w') as f:
+                json.dump(docker_daemon_config, f, indent=2)
+            print(f"✅ Docker镜像源配置成功，已写入 {config_file}")
+            
+            # 重启Docker服务
+            self.run_command("systemctl restart docker", "重启Docker服务")
+        except Exception as e:
+            print(f"❌ 写入Docker配置文件或重启服务失败: {e}")
     
     def optimize_network(self):
         """网络优化设置"""
@@ -493,18 +487,18 @@ class ServerOptimizer:
         
         if self.is_china:
             print("✅ 已应用国内优化策略:")
-            print("   • 使用国内DNS服务器")
-            print("   • 配置GitHub镜像加速")
-            print("   • 配置Gitee访问优化")
-            print("   • 设置Docker国内镜像源")
-            print("   • 应用网络优化参数")
+            print("    • 使用国内DNS服务器")
+            print("    • 配置GitHub镜像加速")
+            print("    • 配置Gitee访问优化")
+            print("    • 设置Docker国内镜像源")
+            print("    • 应用网络优化参数")
         else:
             print("✅ 已应用海外优化策略:")
-            print("   • 使用国际DNS服务器")
-            print("   • 配置GitHub官方访问")
-            print("   • 配置Gitee访问优化")
-            print("   • 设置Docker官方镜像源")
-            print("   • 应用网络优化参数")
+            print("    • 使用国际DNS服务器")
+            print("    • 配置GitHub官方访问")
+            print("    • 配置Gitee访问优化")
+            print("    • 设置Docker官方镜像源")
+            print("    • 应用网络优化参数")
     
     def run_optimization(self):
         """执行完整的优化流程"""
@@ -571,7 +565,7 @@ class ServerOptimizer:
             self.run_command("nslookup github.com", "测试GitHub DNS解析")
             self.run_command("nslookup gitee.com", "测试Gitee DNS解析")
         else:
-            print("   ⚠️  nslookup工具不可用，使用替代方法...")
+            print("    ⚠️  nslookup工具不可用，使用替代方法...")
             # 使用ping测试DNS解析
             self.run_command("ping -c 1 github.com", "使用ping测试GitHub DNS解析")
             self.run_command("ping -c 1 gitee.com", "使用ping测试Gitee DNS解析")
@@ -581,7 +575,7 @@ class ServerOptimizer:
                 self.run_command("dig +short github.com", "使用dig测试GitHub DNS解析")
                 self.run_command("dig +short gitee.com", "使用dig测试Gitee DNS解析")
             else:
-                print("   ⚠️  dig工具也不可用，跳过详细DNS测试")
+                print("    ⚠️  dig工具也不可用，跳过详细DNS测试")
         
         # 提供工具安装建议
         self.suggest_tool_installation()
@@ -701,12 +695,12 @@ class ServerOptimizer:
         if self.run_command("which nslookup", "检查nslookup工具", silent=True):
             self.run_command("nslookup gitee.com", "检查Gitee DNS解析")
         else:
-            print("   ⚠️  nslookup工具不可用")
+            print("    ⚠️  nslookup工具不可用")
         
         if self.run_command("which dig", "检查dig工具", silent=True):
             self.run_command("dig gitee.com", "使用dig检查Gitee解析")
         else:
-            print("   ⚠️  dig工具不可用")
+            print("    ⚠️  dig工具不可用")
         
         # 3. 检查防火墙设置
         print("\n3. 检查防火墙设置...")
@@ -714,7 +708,7 @@ class ServerOptimizer:
         if self.run_command("which ufw", "检查ufw工具", silent=True):
             self.run_command("ufw status", "检查UFW防火墙状态")
         else:
-            print("   ⚠️  ufw工具不可用")
+            print("    ⚠️  ufw工具不可用")
         
         # 4. 检查代理设置
         print("\n4. 检查代理设置...")
@@ -739,55 +733,55 @@ class ServerOptimizer:
         
         # 方案1: 使用镜像站点
         print("1. 🌐 使用Gitee镜像站点:")
-        print("   - https://gitee.com (官方站点)")
-        print("   - https://git.oschina.net (备用域名)")
-        print("   - 尝试使用VPN或代理访问")
+        print("    - https://gitee.com (官方站点)")
+        print("    - https://git.oschina.net (备用域名)")
+        print("    - 尝试使用VPN或代理访问")
         
         # 方案2: 配置代理
         print("\n2. 🔧 配置代理服务器:")
-        print("   # 设置HTTP代理")
-        print("   export http_proxy=http://proxy-server:port")
-        print("   export https_proxy=http://proxy-server:port")
-        print("   # 或者使用socks5代理")
-        print("   export all_proxy=socks5://proxy-server:port")
+        print("    # 设置HTTP代理")
+        print("    export http_proxy=http://proxy-server:port")
+        print("    export https_proxy=http://proxy-server:port")
+        print("    # 或者使用socks5代理")
+        print("    export all_proxy=socks5://proxy-server:port")
         
         # 方案3: 使用Git配置代理
         print("\n3. 🐙 Git代理配置:")
-        print("   # 为Git配置代理")
-        print("   git config --global http.proxy http://proxy-server:port")
-        print("   git config --global https.proxy http://proxy-server:port")
-        print("   # 或者使用socks5")
-        print("   git config --global http.proxy socks5://proxy-server:port")
+        print("    # 为Git配置代理")
+        print("    git config --global http.proxy http://proxy-server:port")
+        print("    git config --global https.proxy http://proxy-server:port")
+        print("    # 或者使用socks5")
+        print("    git config --global http.proxy socks5://proxy-server:port")
         
         # 方案4: 使用SSH方式
         print("\n4. 🔑 使用SSH方式访问:")
-        print("   # 生成SSH密钥")
-        print("   ssh-keygen -t rsa -b 4096 -C 'your_email@example.com'")
-        print("   # 将公钥添加到Gitee账户")
-        print("   cat ~/.ssh/id_rsa.pub")
-        print("   # 测试SSH连接")
-        print("   ssh -T git@gitee.com")
+        print("    # 生成SSH密钥")
+        print("    ssh-keygen -t rsa -b 4096 -C 'your_email@example.com'")
+        print("    # 将公钥添加到Gitee账户")
+        print("    cat ~/.ssh/id_rsa.pub")
+        print("    # 测试SSH连接")
+        print("    ssh -T git@gitee.com")
         
         # 方案5: 使用GitHub作为备选
         print("\n5. 🐙 使用GitHub作为备选:")
-        print("   # 如果Gitee无法访问，可以使用GitHub")
-        print("   git clone https://github.com/username/repository.git")
-        print("   # 或者配置GitHub镜像")
-        print("   git config --global url.'https://github.com/'.insteadOf 'https://gitee.com/'")
+        print("    # 如果Gitee无法访问，可以使用GitHub")
+        print("    git clone https://github.com/username/repository.git")
+        print("    # 或者配置GitHub镜像")
+        print("    git config --global url.'https://github.com/'.insteadOf 'https://gitee.com/'")
         
         # 方案6: 手动修复hosts文件
         print("\n6. 📝 手动修复hosts文件:")
-        print("   # 编辑hosts文件")
-        print("   sudo nano /etc/hosts")
-        print("   # 添加最新的Gitee IP地址")
-        print("   # 可以从以下网站获取最新IP:")
-        print("   # https://www.ipaddress.com/site/gitee.com")
-        print("   # https://dnschecker.org/")
+        print("    # 编辑hosts文件")
+        print("    sudo nano /etc/hosts")
+        print("    # 添加最新的Gitee IP地址")
+        print("    # 可以从以下网站获取最新IP:")
+        print("    # https://www.ipaddress.com/site/gitee.com")
+        print("    # https://dnschecker.org/")
         
         # 方案7: 使用CDN加速
         print("\n7. ⚡ 使用CDN加速:")
-        print("   # 配置Cloudflare或其他CDN")
-        print("   # 或者使用国内CDN服务")
+        print("    # 配置Cloudflare或其他CDN")
+        print("    # 或者使用国内CDN服务")
         
         print("\n" + "=" * 50)
         print("💡 建议按顺序尝试以上方案")
@@ -799,13 +793,13 @@ class ServerOptimizer:
         
         # 检查是否为中国大陆服务器
         if self.is_china:
-            print("   📍 检测到中国大陆服务器")
-            print("   ✅ 中国大陆服务器通常可以正常访问Gitee")
-            print("   💡 如果仍然无法访问，可能是网络配置问题")
+            print("    📍 检测到中国大陆服务器")
+            print("    ✅ 中国大陆服务器通常可以正常访问Gitee")
+            print("    💡 如果仍然无法访问，可能是网络配置问题")
         else:
-            print("   📍 检测到海外服务器")
-            print("   ⚠️  海外服务器通常无法直接访问Gitee")
-            print("   💡 建议使用以下临时解决方案：")
+            print("    📍 检测到海外服务器")
+            print("    ⚠️  海外服务器通常无法直接访问Gitee")
+            print("    💡 建议使用以下临时解决方案：")
             self.provide_overseas_gitee_solutions()
     
     def provide_overseas_gitee_solutions(self):
@@ -815,299 +809,39 @@ class ServerOptimizer:
         
         # 方案1: 使用国内代理
         print("1. 🔧 使用国内代理服务器:")
-        print("   # 设置HTTP代理（需要国内代理服务器）")
-        print("   export http_proxy=http://your-china-proxy:port")
-        print("   export https_proxy=http://your-china-proxy:port")
-        print("   # 测试连接")
-        print("   curl -I https://gitee.com")
+        print("    # 设置HTTP代理（需要国内代理服务器）")
+        print("    export http_proxy=http://your-china-proxy:port")
+        print("    export https_proxy=http://your-china-proxy:port")
+        print("    # 测试连接")
+        print("    curl -I https://gitee.com")
         
         # 方案2: 使用VPN
         print("\n2. 🔒 使用VPN连接到中国大陆:")
-        print("   # 连接VPN后测试")
-        print("   curl -I https://gitee.com")
+        print("    # 连接VPN后测试")
+        print("    curl -I https://gitee.com")
         
         # 方案3: 使用SSH隧道
         print("\n3. 🔗 使用SSH隧道:")
-        print("   # 通过国内服务器建立SSH隧道")
-        print("   ssh -D 1080 user@your-china-server")
-        print("   # 设置SOCKS5代理")
-        print("   export all_proxy=socks5://127.0.0.1:1080")
+        print("    # 通过国内服务器建立SSH隧道")
+        print("    ssh -D 1080 user@your-china-server")
+        print("    # 设置SOCKS5代理")
+        print("    export all_proxy=socks5://127.0.0.1:1080")
         
         # 方案4: 使用GitHub镜像
         print("\n4. 🐙 使用GitHub作为替代:")
-        print("   # 配置Git使用GitHub")
-        print("   git config --global url.'https://github.com/'.insteadOf 'https://gitee.com/'")
-        print("   # 或者直接使用GitHub")
-        print("   git clone https://github.com/username/repository.git")
+        print("    # 配置Git使用GitHub")
+        print("    git config --global url.'https://github.com/'.insteadOf 'https://gitee.com/'")
+        print("    # 或者直接使用GitHub")
+        print("    git clone https://github.com/username/repository.git")
         
         # 方案5: 使用国内服务器
         print("\n5. 🖥️  使用国内服务器:")
-        print("   # 在GitHub Actions或其他CI/CD中使用国内服务器")
-        print("   # 或者使用国内云服务器进行Git操作")
-        
-        # 方案6: 手动同步
-        print("\n6. 📋 手动同步方案:")
-        print("   # 在国内服务器上克隆Gitee仓库")
-        print("   git clone https://gitee.com/username/repository.git")
-        print("   # 打包传输到海外服务器")
-        print("   tar -czf repository.tar.gz repository/")
-        print("   # 在海外服务器上解压")
-        print("   tar -xzf repository.tar.gz")
-        
-        # 方案7: 使用镜像仓库
-        print("\n7. 🪞 使用镜像仓库:")
-        print("   # 寻找项目的GitHub镜像")
-        print("   # 或者使用其他代码托管平台")
+        print("    # 在GitHub Actions或其他CI/CD中使用国内服务器")
         
         print("\n" + "=" * 60)
-        print("💡 推荐方案：使用GitHub作为替代，或配置代理服务器")
-        print("🔗 如果项目必须在Gitee上，建议使用国内服务器或代理")
-    
-    def suggest_tool_installation(self):
-        """提供工具安装建议"""
-        print("\n🔧 工具安装建议:")
-        print("=" * 40)
-        
-        # 检测系统类型
-        if os.path.exists("/etc/debian_version"):
-            print("📦 Debian/Ubuntu系统:")
-            print("   sudo apt update")
-            print("   sudo apt install dnsutils net-tools")
-        elif os.path.exists("/etc/redhat-release"):
-            print("📦 CentOS/RHEL/Fedora系统:")
-            print("   sudo yum install bind-utils net-tools")
-            print("   # 或者使用dnf")
-            print("   sudo dnf install bind-utils net-tools")
-        else:
-            print("📦 通用安装命令:")
-            print("   # 安装DNS工具")
-            print("   sudo apt install dnsutils  # Debian/Ubuntu")
-            print("   sudo yum install bind-utils  # CentOS/RHEL")
-            print("   # 安装网络工具")
-            print("   sudo apt install net-tools  # Debian/Ubuntu")
-            print("   sudo yum install net-tools  # CentOS/RHEL")
-        
-        print("\n💡 安装后可以重新运行脚本获得更详细的诊断信息")
-        print("=" * 40)
-    
-    def install_required_tools(self):
-        """安装必要的工具"""
-        print("    安装DNS和网络工具...")
-        
-        # 检测系统类型并安装工具
-        if os.path.exists("/etc/debian_version"):
-            # Debian/Ubuntu系统
-            self.run_command("apt update", "更新包列表", silent=True)
-            self.run_command("apt install -y dnsutils net-tools curl wget", "安装DNS和网络工具")
-        elif os.path.exists("/etc/redhat-release"):
-            # CentOS/RHEL/Fedora系统
-            if self.run_command("which dnf", "检查dnf", silent=True):
-                self.run_command("dnf install -y bind-utils net-tools curl wget", "安装DNS和网络工具")
-            else:
-                self.run_command("yum install -y bind-utils net-tools curl wget", "安装DNS和网络工具")
-        else:
-            print("    未知系统类型，跳过工具安装")
-    
-    def auto_update_gitee_hosts(self):
-        """自动更新Gitee hosts文件"""
-        try:
-            # 获取最新的Gitee IP
-            new_ip = self.get_latest_gitee_ip()
-            if not new_ip:
-                print("    无法获取最新IP地址")
-                return False
-            
-            print(f"    检测到最新Gitee IP: {new_ip}")
-            
-            # 更新hosts文件
-            hosts_file = "/etc/hosts"
-            if os.path.exists(hosts_file):
-                # 备份当前hosts文件
-                backup_file = f"{hosts_file}.gitee_fix_backup.{int(time.time())}"
-                self.run_command(f"cp {hosts_file} {backup_file}", "备份hosts文件")
-                
-                # 移除旧的Gitee条目
-                self.run_command(f"sed -i '/gitee.com/d' {hosts_file}", "移除旧的Gitee条目")
-                
-                # 添加新的Gitee条目
-                gitee_entries = [
-                    f"{new_ip} gitee.com",
-                    f"{new_ip} www.gitee.com",
-                    f"{new_ip} api.gitee.com"
-                ]
-                
-                for entry in gitee_entries:
-                    self.run_command(f"echo '{entry}' >> {hosts_file}", f"添加 {entry}")
-                
-                print("    hosts文件已更新")
-                return True
-            else:
-                print("    hosts文件不存在")
-                return False
-        except Exception as e:
-            print(f"    更新hosts文件失败: {e}")
-            return False
-    
-    def get_latest_gitee_ip(self):
-        """获取最新的Gitee IP地址"""
-        # 方法1: 使用dig
-        if self.run_command("which dig", "检查dig工具", silent=True):
-            result = subprocess.run("dig +short gitee.com", shell=True, capture_output=True, text=True)
-            if result.returncode == 0 and result.stdout.strip():
-                ip = result.stdout.strip().split('\n')[0]
-                if ip and ip != '127.0.0.1':
-                    return ip
-        
-        # 方法2: 使用nslookup
-        if self.run_command("which nslookup", "检查nslookup工具", silent=True):
-            result = subprocess.run("nslookup gitee.com", shell=True, capture_output=True, text=True)
-            if result.returncode == 0:
-                for line in result.stdout.split('\n'):
-                    if 'Address:' in line and not '#' in line:
-                        ip = line.split('Address:')[-1].strip()
-                        if ip and ip != '127.0.0.1':
-                            return ip
-        
-        # 方法3: 使用ping
-        result = subprocess.run("ping -c 1 gitee.com", shell=True, capture_output=True, text=True)
-        if result.returncode == 0:
-            for line in result.stdout.split('\n'):
-                if 'PING' in line and '(' in line and ')' in line:
-                    ip = line.split('(')[1].split(')')[0]
-                    if ip and ip != '127.0.0.1':
-                        return ip
-        
-        return None
-    
-    def get_gitee_ip_from_online_services(self):
-        """从在线服务获取Gitee IP地址"""
-        print("    尝试从在线服务获取Gitee IP...")
-        
-        # 在线DNS查询服务
-        online_services = [
-            "https://dns.google/resolve?name=gitee.com&type=A",
-            "https://cloudflare-dns.com/dns-query?name=gitee.com&type=A",
-            "https://1.1.1.1/dns-query?name=gitee.com&type=A"
-        ]
-        
-        for service in online_services:
-            try:
-                response = requests.get(service, timeout=10, headers={'Accept': 'application/dns-json'})
-                if response.status_code == 200:
-                    data = response.json()
-                    if 'Answer' in data and len(data['Answer']) > 0:
-                        ip = data['Answer'][0]['data']
-                        if ip and ip != '127.0.0.1':
-                            print(f"    从在线服务获取到IP: {ip}")
-                            # 更新hosts文件
-                            return self.update_hosts_with_ip(ip)
-            except Exception as e:
-                continue
-        
-        return False
-    
-    def update_hosts_with_ip(self, ip):
-        """使用指定IP更新hosts文件"""
-        try:
-            hosts_file = "/etc/hosts"
-            if os.path.exists(hosts_file):
-                # 移除旧的Gitee条目
-                self.run_command(f"sed -i '/gitee.com/d' {hosts_file}", "移除旧的Gitee条目")
-                
-                # 添加新的Gitee条目
-                gitee_entries = [
-                    f"{ip} gitee.com",
-                    f"{ip} www.gitee.com",
-                    f"{ip} api.gitee.com"
-                ]
-                
-                for entry in gitee_entries:
-                    self.run_command(f"echo '{entry}' >> {hosts_file}", f"添加 {entry}")
-                
-                print("    hosts文件已更新")
-                return True
-        except Exception as e:
-            print(f"    更新hosts文件失败: {e}")
-            return False
-    
-    def attempt_auto_fix(self):
-        """尝试自动修复Gitee连接问题"""
-        print("🔧 尝试自动修复...")
-        
-        # 1. 刷新DNS缓存
-        print("  刷新DNS缓存...")
-        self.run_command("systemctl restart systemd-resolved", "重启DNS服务")
-        self.run_command("nscd -i hosts", "刷新nscd缓存")
-        
-        # 2. 安装必要的工具
-        print("  安装必要的工具...")
-        self.install_required_tools()
-        
-        # 3. 更新hosts文件中的Gitee IP
-        print("  更新Gitee IP地址...")
-        fix_result = self.auto_update_gitee_hosts()
-        
-        # 4. 测试修复效果
-        print("  测试修复效果...")
-        test_result = self.test_gitee_with_retry(max_retries=3)
-        if test_result:
-            print("  ✅ 自动修复成功！")
-        else:
-            print("  ❌ 自动修复失败，尝试更多方法...")
-            # 尝试从在线服务获取IP
-            online_fix_result = self.get_gitee_ip_from_online_services()
-            if online_fix_result:
-                print("  ✅ 在线服务修复成功！")
-            else:
-                print("  ❌ 所有自动修复方法失败，请尝试手动方案")
-
-
-def check_dependencies():
-    """检查依赖包"""
-    try:
-        import requests
-        return True
-    except ImportError:
-        print("❌ 缺少必要的依赖包: requests")
-        print("请运行以下命令安装依赖:")
-        print("pip3 install requests")
-        print("或者重新运行启动脚本: ./run_optimizer.sh")
-        return False
-
-
-def main():
-    """主函数"""
-    print("🔧 智能服务器优化工具")
-    print("=" * 50)
-    
-    # 检查依赖
-    if not check_dependencies():
-        sys.exit(1)
-    
-    # 检查是否以root权限运行
-    is_admin = os.getuid() == 0
-    
-    if not is_admin:
-        print("⚠️  警告: 建议以root权限运行此脚本以获得最佳效果")
-        print("   某些优化可能需要root权限")
-    
-    # 创建优化器实例
-    optimizer = ServerOptimizer()
-    
-    # 执行优化
-    try:
-        success = optimizer.run_optimization()
-        if success:
-            print("\n✅ 优化流程执行完成")
-        else:
-            print("\n❌ 优化流程执行失败")
-            sys.exit(1)
-    except KeyboardInterrupt:
-        print("\n⚠️  用户中断操作")
-        sys.exit(1)
-    except Exception as e:
-        print(f"\n❌ 优化过程中发生错误: {e}")
-        sys.exit(1)
+        print("💡 建议按顺序尝试以上方案")
+        print("📞 如果问题持续存在，请联系网络管理员或ISP")
 
 if __name__ == "__main__":
-    main() 
+    optimizer = ServerOptimizer()
+    optimizer.run_optimization()
