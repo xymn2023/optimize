@@ -32,7 +32,7 @@
 
 
 ```
-curl -sL https://raw.githubusercontent.com/xymn2023/optimize/main/run_optimizer.sh -o run_optimizer.sh && sudo chmod +x run_optimizer.sh && sudo ./run_optimizer.sh
+git clone https://github.com/xymn2023/optimize.git && cd optimize && sudo chmod +x run_optimizer.sh && sudo ./run_optimizer.sh
 ```
 
 ## 使用说明
